@@ -1,0 +1,17 @@
+{
+  "name": "gl-flyCamera",
+  "description": "✈️ controls",
+  "version": "0.0.1",
+  "repository": "github.com:Ramshackle-Jamathon/gl-flyCamera.git",
+  "author": "Joseph Van Drunen <josephvandrunen@gmail.com>",
+  "keywords": [
+    "webgl",
+    "camera",
+    "quaternion"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "dependencies": {
+    "gl-matrix": "^2.3.2"
+  }
+}
