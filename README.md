@@ -10,11 +10,23 @@ $ npm install gl-flyCamera
 ## Example
 
 ```javascript
-controls = new flyCamera();
+controls = new flyCamera({
+	domElement: document, // default: document
+	movementSpeed: 100, // default: 10
+	rollSpeed: Math.PI, // default: Math.PI / 3
+	dragToLook: true, // default: false
+	autoForward: true, // default: false
+	paused: true, //default: false
+	position: [1, 2, 5] //default: [0, 0, 0]
+});
 controls.start();
 
-function renderLoop(){
-	controls.update();
+var lastTimeStamp = 0;
+function renderLoop(timeStamp){
+	var delta = timeStamp - lastTimeStamp;
+	lastTimeStamp = timeStamp;
+
+	controls.update(delta);
 	var currentPosition = controls.position; //current camera position
 	var currentOrientation = controls.quaternion; //current camera orientation
 	/*

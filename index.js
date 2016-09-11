@@ -1,24 +1,25 @@
 var glMatrix = require('gl-matrix');
 
-var flyCamera = function( domElement ) {
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
+var flyCamera = function( opts ) {
+	if ( !opts ) opts = {};
+	this.domElement = ( opts.domElement !== undefined ) ? opts.domElement : document;
+	if ( opts.domElement ) this.domElement.setAttribute( 'tabindex', -1 );
 
-	this.movementSpeed = 1.0;
-	this.rollSpeed = 0.05;
-	this.dragToLook = false;
-	this.autoForward = false;
-	this.paused = false;
+	this.movementSpeed = opts.movementSpeed || 10.0;
+	this.rollSpeed = opts.rollSpeed || Math.PI / 3;
+	this.dragToLook = opts.dragToLook || false;
+	this.autoForward = opts.autoForward || false;
+	this.paused = opts.paused || false;
 	this.mouseStatus = 0;
 
 	this.tmpQuaternion = glMatrix.quat.create();
 	this.moveVector = glMatrix.vec3.create();
 	this.rotationVector = glMatrix.vec3.create();
 
-	this.position = glMatrix.vec3.fromValues( 1, 6, 0);
-	this.quaternion = glMatrix.quat.create();
-
-	this.lastUpdate = Date.now();
+	this.position = glMatrix.vec3.fromValues(opts.position[0], opts.position[1], opts.position[2]) || 
+		glMatrix.vec3.create();
+	this.quaternion = glMatrix.quat.fromValues(opts.quaternion[0], opts.quaternion[1], opts.quaternion[2], opts.quaternion[3]) ||
+		glMatrix.quat.create();
 
 	this.moveState = { 
 		up: 0, 
@@ -55,6 +56,7 @@ flyCamera.prototype.keydown = function (event) {
 		case 39: /*right*/ this.moveState.yawRight = 1; break;
 		case 81: /*Q*/ this.moveState.rollLeft = 1; break;
 		case 69: /*E*/ this.moveState.rollRight = 1; break;
+		case 32: /*space*/ this.paused = !this.paused; break;
 	}
 	this.updateMovementVector();
 	this.updateRotationVector();
@@ -124,14 +126,12 @@ flyCamera.prototype.mouseup = function (event) {
 	this.updateRotationVector();
 };
 
-flyCamera.prototype.update = function () {
+flyCamera.prototype.update = function (delta) {
 	if (!this.paused){
 		this.updateMovementVector();
 		this.updateRotationVector();
 
-		var now = Date.now();
-		var delta = (now - this.lastUpdate) / 100;
-		this.lastUpdate = now;
+		delta = delta / 1000;
 
 		var moveMult = delta * this.movementSpeed;
 		var rotMult  = delta * this.rollSpeed;
@@ -170,7 +170,7 @@ flyCamera.prototype.updateRotationVector = function () {
 };
 
 flyCamera.prototype.getContainerDimensions = function () {
-	if ( this.domElement != document ) {
+	if ( this.domElement !== document ) {
 		return {
 			size  : [ this.domElement.offsetWidth, this.domElement.offsetHeight ],
 			offset  : [ this.domElement.offsetLeft,  this.domElement.offsetTop ]
