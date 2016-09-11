@@ -16,10 +16,17 @@ var flyCamera = function( opts ) {
 	this.moveVector = glMatrix.vec3.create();
 	this.rotationVector = glMatrix.vec3.create();
 
-	this.position = glMatrix.vec3.fromValues(opts.position[0], opts.position[1], opts.position[2]) || 
-		glMatrix.vec3.create();
-	this.quaternion = glMatrix.quat.fromValues(opts.quaternion[0], opts.quaternion[1], opts.quaternion[2], opts.quaternion[3]) ||
-		glMatrix.quat.create();
+
+	if (opts.position){
+		this.position = glMatrix.vec3.fromValues(opts.position[0], opts.position[1], opts.position[2])
+	} else {
+		this.position = glMatrix.vec3.create();
+	}
+	if(opts.quaternion){
+		this.quaternion = glMatrix.quat.fromValues(opts.quaternion[0], opts.quaternion[1], opts.quaternion[2], opts.quaternion[3])
+	} else {
+		this.quaternion = glMatrix.quat.create();
+	}
 
 	this.moveState = { 
 		up: 0, 
