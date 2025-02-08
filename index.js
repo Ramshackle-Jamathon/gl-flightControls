@@ -48,7 +48,6 @@ flyCamera.prototype.keydown = function (event) {
 	if ( event.altKey ) {
 			return;
 	}
-	event.preventDefault();
 	switch ( event.keyCode ) {
 		case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
 		case 87: /*W*/ this.moveState.forward = 1; break;
@@ -100,12 +99,17 @@ flyCamera.prototype.mousemove = function (event) {
 	}
 };
 
+flyCamera.prototype.mouseleave = function (event) {
+	if ( !this.dragToLook || this.mouseStatus > 0 ) {
+		this.moveState.yawLeft = this.moveState.pitchDown = 0;
+		this.updateRotationVector();
+	}
+};
+
 flyCamera.prototype.mousedown = function (event) {
 	if ( this.domElement !== document ) {
 		this.domElement.focus();
 	}
-	event.preventDefault();
-	event.stopPropagation();
 	if ( this.dragToLook ) {
 		this.mouseStatus ++;
 	} else {
@@ -118,8 +122,6 @@ flyCamera.prototype.mousedown = function (event) {
 };
 
 flyCamera.prototype.mouseup = function (event) {
-	event.preventDefault();
-	event.stopPropagation();
 	if ( this.dragToLook ) {
 		this.mouseStatus --;
 		this.moveState.yawLeft = this.moveState.pitchDown = 0;
@@ -191,10 +193,11 @@ flyCamera.prototype.getContainerDimensions = function () {
 };
 
 flyCamera.prototype.start = function () {
-	document.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); } );
-	document.addEventListener( 'mousemove', this.mousemove.bind(this) );
-	document.addEventListener( 'mousedown', this.mousedown.bind(this) );
-	document.addEventListener( 'mouseup',   this.mouseup.bind(this) );
+	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); } );
+	this.domElement.addEventListener( 'mousemove', this.mousemove.bind(this) );
+	this.domElement.addEventListener( 'mouseleave', this.mouseleave.bind(this) );
+	this.domElement.addEventListener( 'mousedown', this.mousedown.bind(this) );
+	this.domElement.addEventListener( 'mouseup',   this.mouseup.bind(this) );
 	window.addEventListener( 'keydown', this.keydown.bind(this) );
 	window.addEventListener( 'keyup',   this.keyup.bind(this) );
 	this.updateMovementVector();
